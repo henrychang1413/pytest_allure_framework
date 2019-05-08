@@ -1,7 +1,5 @@
 # allure pytest framework
-
-This is pytest framework with python3, use allure to generate report.
-include two test modules, one is for mysql testing, another is for math function testing.The scripts run on windows10 system.
+This repository contains a plugin for pytest which automatically prepares input data used to generate Allure Report. It includes two test modules, one is for mysql testing, another is for math function testing.The scripts run on windows10 system.
 
 Environment setup steps:
 
