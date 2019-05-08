@@ -43,7 +43,6 @@ download ALlure zip package(allure-2.7.0.zip), unzip this package to your pytest
  ![alt text](https://github.com/henrychang1413/pytest_allure_framework/blob/master/allure_graphs.PNG)
  ![alt text](https://github.com/henrychang1413/pytest_allure_framework/blob/master/allure_log_show.PNG)
  ![alt text](https://github.com/henrychang1413/pytest_allure_framework/blob/master/allure_fail_case.PNG)
- ![alt text](https://github.com/henrychang1413/python_selenium_framework/blob/master/report.png)
-        
+
 
 
