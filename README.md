@@ -28,6 +28,8 @@ download ALlure zip package(allure-2.7.0.zip), unzip this package to your pytest
     a> generate html format report:
         pytest tests --html=.\logs\log.html
 
+       ![alt text](https://github.com/henrychang1413/pytest_allure_framework/blob/master/html_report.PNG)
+
     b> generate normal txt format report
         pytest tests --resultlog=log.txt
 
@@ -37,5 +39,10 @@ download ALlure zip package(allure-2.7.0.zip), unzip this package to your pytest
 
         To view the allure report on the browser.
         allure serve report/
+        ![alt text](https://github.com/henrychang1413/pytest_allure_framework/blob/master/allure.PNG)
+        ![alt text](https://github.com/henrychang1413/pytest_allure_framework/blob/master/allure_graphs.PNG)
+        ![alt text](https://github.com/henrychang1413/pytest_allure_framework/blob/master/allure_log_show.PNG)
+        ![alt text](https://github.com/henrychang1413/pytest_allure_framework/blob/master/allure_fail_case.PNG)
+        
 
 
