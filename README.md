@@ -1,9 +1,10 @@
 # allure pytest framework
 
 This is pytest framework with python3, use allure to generate report.
-include two test modules, one is for mysql testing, another is for math function testing.
+include two test modules, one is for mysql testing, another is for math function testing.The scripts run on windows10 system.
 
-The scripts run on windows10 system. setup environment steps follows:
+Environment setup steps:
+
 1). install Java
 Add it in the system environment Variables(Path), check java install successfully
 
@@ -19,10 +20,10 @@ download ALlure zip package(allure-2.7.0.zip), unzip this package to your pytest
     2.7.0
 
 3). Install all the dependencies
+
     pip install -r requirements.txt
 
-4). run test cases under project folder:
-    pytest can generate different format report.
+4). Pytest can generate different format report. Run test cases under project folder.
 
     a> generate html format report:
         pytest tests --html=.\logs\log.html
