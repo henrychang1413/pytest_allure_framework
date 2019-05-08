@@ -1,0 +1,1 @@
+test_max_product.py         25 INFO      input list  is [3, 5, 8], expected is 40

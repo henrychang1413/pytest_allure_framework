@@ -1,0 +1,3 @@
+test_max_product.py         25 INFO      input list  is [2, 4, -2, -5, 6], expected is 24
+conftest.py                 33 INFO     
+ MODULE TEARDOWN => test finished ======

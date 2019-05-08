@@ -1,0 +1,1 @@
+{"uuid": "0bf52524-dde3-4983-9f61-4dc0fb5b7e3b", "children": ["8001608a-098a-4ee4-b2e4-23a76216d5f6"], "befores": [{"name": "MysqlConnect", "status": "passed", "start": 1557296022178, "stop": 1557296022184}], "afters": [{"name": "MysqlConnect::0", "status": "passed", "start": 1557296022247, "stop": 1557296022250}], "start": 1557296022178, "stop": 1557296022250}

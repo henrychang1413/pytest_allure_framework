@@ -1,0 +1,25 @@
+conftest.py                 26 INFO     
+FUNCTION SETUP ==> connect Mysql server 
+
+conftest.py                 21 INFO     MySQL server info: {'host': '127.0.0.1', 'user': 'root', 'passwd': '123456', 'db': 'test', 'port': 3306} 
+mysql_connect.py            36 INFO     success to connect sql server: 127.0.0.1 with username=root password=123456
+test_mysql_function.py      25 INFO     ===> test case: test_mysql_insert_data_to_employee 
+mysql_connect.py            52 INFO     execute sql statement: INSERT INTO EMPLOYEE(NAME,AGE, SEX, INCOME)
+         VALUES ('Mary', 21, 'M', 2020),
+                ('Kevin', 22, 'M', 2100),
+                ('David', 23, 'M', 2030),
+                ('Jack', 21, 'M', 2200),
+                ('Marin', 20, 'F', 2020)
+mysql_connect.py            75 INFO     execute 'commit' operation
+mysql_connect.py            52 INFO     execute sql statement: select * from EMPLOYEE
+mysql_connect.py            60 INFO     fetch all sql result: 
+mysql_connect.py            63 INFO     ('Mary', 21, 'M', None, 2020.0)
+mysql_connect.py            63 INFO     ('Kevin', 22, 'M', None, 2100.0)
+mysql_connect.py            63 INFO     ('David', 23, 'M', None, 2030.0)
+mysql_connect.py            63 INFO     ('Jack', 21, 'M', None, 2200.0)
+mysql_connect.py            63 INFO     ('Marin', 20, 'F', None, 2020.0)
+test_mysql_function.py      40 INFO     (('Mary', 21, 'M', None, 2020.0), ('Kevin', 22, 'M', None, 2100.0), ('David', 23, 'M', None, 2030.0), ('Jack', 21, 'M', None, 2200.0), ('Marin', 20, 'F', None, 2020.0))
+conftest.py                 31 INFO     
+FUNCTION TEARDOWN ==> disconnect Mysql server
+
+mysql_connect.py           115 INFO     disconnect sql server

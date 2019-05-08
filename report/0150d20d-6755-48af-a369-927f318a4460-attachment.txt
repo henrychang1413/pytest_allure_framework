@@ -1,0 +1,8 @@
+conftest.py                 30 INFO     
+ MODULE SETUP => Fetching data from db ======
+
+conftest.py                 23 INFO     return test data [((1, 2, 3), 5), ((-1, -2, -3), -3), ((-1, 2, 1), 3), ((-3, 2, 8), 10)]
+test_max_sum.py             18 INFO      input list  is [1, 2, 3], expected is 5
+test_max_sum.py             18 INFO      input list  is [-1, -2, -3], expected is -3
+test_max_sum.py             18 INFO      input list  is [-1, 2, 1], expected is 3
+test_max_sum.py             18 INFO      input list  is [-3, 2, 8], expected is 10
