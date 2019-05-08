@@ -1,3 +1,0 @@
-test_max_sum.py             24 INFO      input list  is [2, 4, -2, -5, 6], expected is 10
-conftest.py                 33 INFO     
- MODULE TEARDOWN => test finished ======

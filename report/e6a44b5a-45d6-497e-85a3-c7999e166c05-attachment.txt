@@ -1,6 +1,0 @@
-conftest.py                 30 INFO     
- MODULE SETUP => Fetching data from db ======
-
-conftest.py                 17 INFO     return test data [((1, 2, 3), 6), ((-1, -2, -3), 6), ((-1, 2, 1), 2), ((-3, 2, 8), 24)]
-test_max_product.py         18 INFO      input list  is [1, 2, 3], expected is 6
-test_max_product.py         18 INFO      input list  is [-1, -2, -3], expected is 6

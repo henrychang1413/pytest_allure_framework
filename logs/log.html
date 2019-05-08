@@ -1,0 +1,565 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8"/>
+    <title>Test Report</title>
+    <link href="assets/style.css" rel="stylesheet" type="text/css"/></head>
+  <body onLoad="init()">
+    <script>/* This Source Code Form is subject to the terms of the Mozilla Public
+ * License, v. 2.0. If a copy of the MPL was not distributed with this file,
+ * You can obtain one at http://mozilla.org/MPL/2.0/. */
+
+
+function toArray(iter) {
+    if (iter === null) {
+        return null;
+    }
+    return Array.prototype.slice.call(iter);
+}
+
+function find(selector, elem) {
+    if (!elem) {
+        elem = document;
+    }
+    return elem.querySelector(selector);
+}
+
+function find_all(selector, elem) {
+    if (!elem) {
+        elem = document;
+    }
+    return toArray(elem.querySelectorAll(selector));
+}
+
+function sort_column(elem) {
+    toggle_sort_states(elem);
+    var colIndex = toArray(elem.parentNode.childNodes).indexOf(elem);
+    var key;
+    if (elem.classList.contains('numeric')) {
+        key = key_num;
+    } else if (elem.classList.contains('result')) {
+        key = key_result;
+    } else {
+        key = key_alpha;
+    }
+    sort_table(elem, key(colIndex));
+}
+
+function show_all_extras() {
+    find_all('.col-result').forEach(show_extras);
+}
+
+function hide_all_extras() {
+    find_all('.col-result').forEach(hide_extras);
+}
+
+function show_extras(colresult_elem) {
+    var extras = colresult_elem.parentNode.nextElementSibling;
+    var expandcollapse = colresult_elem.firstElementChild;
+    extras.classList.remove("collapsed");
+    expandcollapse.classList.remove("expander");
+    expandcollapse.classList.add("collapser");
+}
+
+function hide_extras(colresult_elem) {
+    var extras = colresult_elem.parentNode.nextElementSibling;
+    var expandcollapse = colresult_elem.firstElementChild;
+    extras.classList.add("collapsed");
+    expandcollapse.classList.remove("collapser");
+    expandcollapse.classList.add("expander");
+}
+
+function show_filters() {
+    var filter_items = document.getElementsByClassName('filter');
+    for (var i = 0; i < filter_items.length; i++)
+        filter_items[i].hidden = false;
+}
+
+function add_collapse() {
+    // Add links for show/hide all
+    var resulttable = find('table#results-table');
+    var showhideall = document.createElement("p");
+    showhideall.innerHTML = '<a href="javascript:show_all_extras()">Show all details</a> / ' +
+                            '<a href="javascript:hide_all_extras()">Hide all details</a>';
+    resulttable.parentElement.insertBefore(showhideall, resulttable);
+
+    // Add show/hide link to each result
+    find_all('.col-result').forEach(function(elem) {
+        var collapsed = get_query_parameter('collapsed') || 'Passed';
+        var extras = elem.parentNode.nextElementSibling;
+        var expandcollapse = document.createElement("span");
+        if (collapsed.includes(elem.innerHTML)) {
+            extras.classList.add("collapsed");
+            expandcollapse.classList.add("expander");
+        } else {
+            expandcollapse.classList.add("collapser");
+        }
+        elem.appendChild(expandcollapse);
+
+        elem.addEventListener("click", function(event) {
+            if (event.currentTarget.parentNode.nextElementSibling.classList.contains("collapsed")) {
+                show_extras(event.currentTarget);
+            } else {
+                hide_extras(event.currentTarget);
+            }
+        });
+    })
+}
+
+function get_query_parameter(name) {
+    var match = RegExp('[?&]' + name + '=([^&]*)').exec(window.location.search);
+    return match && decodeURIComponent(match[1].replace(/\+/g, ' '));
+}
+
+function init () {
+    reset_sort_headers();
+
+    add_collapse();
+
+    show_filters();
+
+    toggle_sort_states(find('.initial-sort'));
+
+    find_all('.sortable').forEach(function(elem) {
+        elem.addEventListener("click",
+                              function(event) {
+                                  sort_column(elem);
+                              }, false)
+    });
+
+};
+
+function sort_table(clicked, key_func) {
+    var rows = find_all('.results-table-row');
+    var reversed = !clicked.classList.contains('asc');
+    var sorted_rows = sort(rows, key_func, reversed);
+    /* Whole table is removed here because browsers acts much slower
+     * when appending existing elements.
+     */
+    var thead = document.getElementById("results-table-head");
+    document.getElementById('results-table').remove();
+    var parent = document.createElement("table");
+    parent.id = "results-table";
+    parent.appendChild(thead);
+    sorted_rows.forEach(function(elem) {
+        parent.appendChild(elem);
+    });
+    document.getElementsByTagName("BODY")[0].appendChild(parent);
+}
+
+function sort(items, key_func, reversed) {
+    var sort_array = items.map(function(item, i) {
+        return [key_func(item), i];
+    });
+    var multiplier = reversed ? -1 : 1;
+
+    sort_array.sort(function(a, b) {
+        var key_a = a[0];
+        var key_b = b[0];
+        return multiplier * (key_a >= key_b ? 1 : -1);
+    });
+
+    return sort_array.map(function(item) {
+        var index = item[1];
+        return items[index];
+    });
+}
+
+function key_alpha(col_index) {
+    return function(elem) {
+        return elem.childNodes[1].childNodes[col_index].firstChild.data.toLowerCase();
+    };
+}
+
+function key_num(col_index) {
+    return function(elem) {
+        return parseFloat(elem.childNodes[1].childNodes[col_index].firstChild.data);
+    };
+}
+
+function key_result(col_index) {
+    return function(elem) {
+        var strings = ['Error', 'Failed', 'Rerun', 'XFailed', 'XPassed',
+                       'Skipped', 'Passed'];
+        return strings.indexOf(elem.childNodes[1].childNodes[col_index].firstChild.data);
+    };
+}
+
+function reset_sort_headers() {
+    find_all('.sort-icon').forEach(function(elem) {
+        elem.parentNode.removeChild(elem);
+    });
+    find_all('.sortable').forEach(function(elem) {
+        var icon = document.createElement("div");
+        icon.className = "sort-icon";
+        icon.textContent = "vvv";
+        elem.insertBefore(icon, elem.firstChild);
+        elem.classList.remove("desc", "active");
+        elem.classList.add("asc", "inactive");
+    });
+}
+
+function toggle_sort_states(elem) {
+    //if active, toggle between asc and desc
+    if (elem.classList.contains('active')) {
+        elem.classList.toggle('asc');
+        elem.classList.toggle('desc');
+    }
+
+    //if inactive, reset all other functions and add ascending active
+    if (elem.classList.contains('inactive')) {
+        reset_sort_headers();
+        elem.classList.remove('inactive');
+        elem.classList.add('active');
+    }
+}
+
+function is_all_rows_hidden(value) {
+  return value.hidden == false;
+}
+
+function filter_table(elem) {
+    var outcome_att = "data-test-result";
+    var outcome = elem.getAttribute(outcome_att);
+    class_outcome = outcome + " results-table-row";
+    var outcome_rows = document.getElementsByClassName(class_outcome);
+
+    for(var i = 0; i < outcome_rows.length; i++){
+        outcome_rows[i].hidden = !elem.checked;
+    }
+
+    var rows = find_all('.results-table-row').filter(is_all_rows_hidden);
+    var all_rows_hidden = rows.length == 0 ? true : false;
+    var not_found_message = document.getElementById("not-found-message");
+    not_found_message.hidden = !all_rows_hidden;
+}
+</script>
+    <h1>log.html</h1>
+    <p>Report generated on 08-May-2019 at 09:01:34 by <a href="https://pypi.python.org/pypi/pytest-html">pytest-html</a> v1.20.0</p>
+    <h2>Environment</h2>
+    <table id="environment">
+      <tr>
+        <td>JAVA_HOME</td>
+        <td>C:\Program Files\Java\jdk1.8.0_202</td></tr>
+      <tr>
+        <td>Packages</td>
+        <td>{&apos;pytest&apos;: &apos;4.4.0&apos;, &apos;py&apos;: &apos;1.8.0&apos;, &apos;pluggy&apos;: &apos;0.9.0&apos;}</td></tr>
+      <tr>
+        <td>Platform</td>
+        <td>Windows-10-10.0.17134-SP0</td></tr>
+      <tr>
+        <td>Plugins</td>
+        <td>{&apos;xdist&apos;: &apos;1.28.0&apos;, &apos;metadata&apos;: &apos;1.8.0&apos;, &apos;logger&apos;: &apos;0.4.0&apos;, &apos;html&apos;: &apos;1.20.0&apos;, &apos;forked&apos;: &apos;1.0.2&apos;, &apos;cov&apos;: &apos;2.6.1&apos;, &apos;hypothesis&apos;: &apos;4.14.5&apos;, &apos;allure-pytest&apos;: &apos;2.6.2&apos;}</td></tr>
+      <tr>
+        <td>Python</td>
+        <td>3.7.1</td></tr></table>
+    <h2>Summary</h2>
+    <p>17 tests ran in 1.26 seconds. </p>
+    <p class="filter" hidden="true">(Un)check the boxes to filter the results.</p><input checked="true" class="filter" data-test-result="passed" hidden="true" name="filter_checkbox" onChange="filter_table(this)" type="checkbox"/><span class="passed">16 passed</span>, <input checked="true" class="filter" data-test-result="skipped" disabled="true" hidden="true" name="filter_checkbox" onChange="filter_table(this)" type="checkbox"/><span class="skipped">0 skipped</span>, <input checked="true" class="filter" data-test-result="failed" hidden="true" name="filter_checkbox" onChange="filter_table(this)" type="checkbox"/><span class="failed">1 failed</span>, <input checked="true" class="filter" data-test-result="error" disabled="true" hidden="true" name="filter_checkbox" onChange="filter_table(this)" type="checkbox"/><span class="error">0 errors</span>, <input checked="true" class="filter" data-test-result="xfailed" disabled="true" hidden="true" name="filter_checkbox" onChange="filter_table(this)" type="checkbox"/><span class="xfailed">0 expected failures</span>, <input checked="true" class="filter" data-test-result="xpassed" disabled="true" hidden="true" name="filter_checkbox" onChange="filter_table(this)" type="checkbox"/><span class="xpassed">0 unexpected passes</span>
+    <h2>Results</h2>
+    <table id="results-table">
+      <thead id="results-table-head">
+        <tr>
+          <th class="sortable result initial-sort" col="result">Result</th>
+          <th class="sortable" col="name">Test</th>
+          <th class="sortable numeric" col="duration">Duration</th>
+          <th>Links</th></tr>
+        <tr hidden="true" id="not-found-message">
+          <th colspan="4">No results found. Try to check the filters</th></tr></thead>
+      <tbody class="failed results-table-row">
+        <tr>
+          <td class="col-result">Failed</td>
+          <td class="col-name">test_math_algorithm/test_max_product.py::test_max_product_from_list</td>
+          <td class="col-duration">0.00</td>
+          <td class="col-links"></td></tr>
+        <tr>
+          <td class="extra" colspan="4">
+            <div class="log">get_test_product_data = [((1, 2, 3), 6), ((-1, -2, -3), 6), ((-1, 2, 1), 2), ((-3, 2, 8), 24)]<br/><br/>    def test_max_product_from_list(get_test_product_data):<br/>        for ele in get_test_product_data:<br/>            input_list = []<br/>            for node in ele[0]:<br/>                input_list.append(node)<br/>            expected = ele[1]<br/>            log.info(&quot; input list  is %s, expected is %s&quot; % (str(input_list),str(expected)) )<br/>            calc_value = max_product_from_list(input_list)<br/>&gt;           assert calc_value == expected, &#x27;expected max product value is %s&#x27; %str(expected)<br/><span class="error">E           AssertionError: expected max product value is 6</span><br/><span class="error">E           assert 2 == 6</span><br/><span class="error">E             -2</span><br/><span class="error">E             +6</span><br/><br/>tests\test_math_algorithm\test_max_product.py:20: AssertionError<br/>------------------------------ Captured log setup ------------------------------<br/>conftest.py                 30 INFO     
+ MODULE SETUP =&gt; Fetching data from db ======
+
+conftest.py                 17 INFO     return test data [((1, 2, 3), 6), ((-1, -2, -3), 6), ((-1, 2, 1), 2), ((-3, 2, 8), 24)]------------------------------ Captured log call -------------------------------<br/>test_max_product.py         18 INFO      input list  is [1, 2, 3], expected is 6
+test_max_product.py         18 INFO      input list  is [-1, -2, -3], expected is 6</div></td></tr></tbody>
+      <tbody class="passed results-table-row">
+        <tr>
+          <td class="col-result">Passed</td>
+          <td class="col-name">test_math_algorithm/test_max_product.py::test_max_product_from_list_parametrize[input_list0-40]</td>
+          <td class="col-duration">0.00</td>
+          <td class="col-links"></td></tr>
+        <tr>
+          <td class="extra" colspan="4">
+            <div class="log">------------------------------ Captured log call -------------------------------<br/>test_max_product.py         25 INFO      input list  is [3, 5, 8], expected is 40</div></td></tr></tbody>
+      <tbody class="passed results-table-row">
+        <tr>
+          <td class="col-result">Passed</td>
+          <td class="col-name">test_math_algorithm/test_max_product.py::test_max_product_from_list_parametrize[input_list1-24]</td>
+          <td class="col-duration">0.02</td>
+          <td class="col-links"></td></tr>
+        <tr>
+          <td class="extra" colspan="4">
+            <div class="log">------------------------------ Captured log call -------------------------------<br/>test_max_product.py         25 INFO      input list  is [2, 4, -2, -5, 6], expected is 24</div></td></tr></tbody>
+      <tbody class="passed results-table-row">
+        <tr>
+          <td class="col-result">Passed</td>
+          <td class="col-name">test_math_algorithm/test_max_sum.py::test_max_sum_from_list</td>
+          <td class="col-duration">0.02</td>
+          <td class="col-links"></td></tr>
+        <tr>
+          <td class="extra" colspan="4">
+            <div class="log">------------------------------ Captured log setup ------------------------------<br/>conftest.py                 30 INFO     
+ MODULE SETUP =&gt; Fetching data from db ======
+
+conftest.py                 23 INFO     return test data [((1, 2, 3), 5), ((-1, -2, -3), -3), ((-1, 2, 1), 3), ((-3, 2, 8), 10)]------------------------------ Captured log call -------------------------------<br/>test_max_sum.py             18 INFO      input list  is [1, 2, 3], expected is 5
+test_max_sum.py             18 INFO      input list  is [-1, -2, -3], expected is -3
+test_max_sum.py             18 INFO      input list  is [-1, 2, 1], expected is 3
+test_max_sum.py             18 INFO      input list  is [-3, 2, 8], expected is 10</div></td></tr></tbody>
+      <tbody class="passed results-table-row">
+        <tr>
+          <td class="col-result">Passed</td>
+          <td class="col-name">test_math_algorithm/test_max_sum.py::test_max_sum_from_list_parametrize[input_list0-13]</td>
+          <td class="col-duration">0.00</td>
+          <td class="col-links"></td></tr>
+        <tr>
+          <td class="extra" colspan="4">
+            <div class="log">------------------------------ Captured log call -------------------------------<br/>test_max_sum.py             24 INFO      input list  is [3, 5, 8, 2], expected is 13</div></td></tr></tbody>
+      <tbody class="passed results-table-row">
+        <tr>
+          <td class="col-result">Passed</td>
+          <td class="col-name">test_math_algorithm/test_max_sum.py::test_max_sum_from_list_parametrize[input_list1-10]</td>
+          <td class="col-duration">0.00</td>
+          <td class="col-links"></td></tr>
+        <tr>
+          <td class="extra" colspan="4">
+            <div class="log">------------------------------ Captured log call -------------------------------<br/>test_max_sum.py             24 INFO      input list  is [2, 4, -2, -5, 6], expected is 10</div></td></tr></tbody>
+      <tbody class="passed results-table-row">
+        <tr>
+          <td class="col-result">Passed</td>
+          <td class="col-name">test_mysql/test_mysql_class.py::TestJsonData::test_create_table_events</td>
+          <td class="col-duration">0.05</td>
+          <td class="col-links"></td></tr>
+        <tr>
+          <td class="extra" colspan="4">
+            <div class="log">------------------------------ Captured log setup ------------------------------<br/>conftest.py                 50 INFO     
+ MODULE SETUP =&gt; Fetching data from db ======
+
+conftest.py                 36 INFO     class setup -&gt; connect Mysql server
+conftest.py                 21 INFO     MySQL server info: {&#x27;host&#x27;: &#x27;127.0.0.1&#x27;, &#x27;user&#x27;: &#x27;root&#x27;, &#x27;passwd&#x27;: &#x27;123456&#x27;, &#x27;db&#x27;: &#x27;test&#x27;, &#x27;port&#x27;: 3306} 
+mysql_connect.py            36 INFO     success to connect sql server: 127.0.0.1 with username=root password=123456------------------------------ Captured log call -------------------------------<br/>test_mysql_class.py         14 INFO     ===&gt; test case: test_create_table_events 
+mysql_connect.py            47 INFO     delete table : events
+mysql_connect.py            52 INFO     execute sql statement: drop table if exists events
+mysql_connect.py            52 INFO     execute sql statement: CREATE TABLE events(
+                id INT auto_increment primary key,
+                event_name VARCHAR(100),
+                visitor VARCHAR(100),
+                properties json,
+                browser json)</div></td></tr></tbody>
+      <tbody class="passed results-table-row">
+        <tr>
+          <td class="col-result">Passed</td>
+          <td class="col-name">test_mysql/test_mysql_class.py::TestJsonData::test_create_insert_data_to_events</td>
+          <td class="col-duration">0.02</td>
+          <td class="col-links"></td></tr>
+        <tr>
+          <td class="extra" colspan="4">
+            <div class="log">------------------------------ Captured log call -------------------------------<br/>test_mysql_class.py         27 INFO     ===&gt; test case: test_create_insert_data_to_events 
+mysql_connect.py            52 INFO     execute sql statement:  INSERT INTO events(event_name, visitor,properties, browser)
+             VALUES (
+                    &#x27;pageview&#x27;,
+                       &#x27;1&#x27;,
+                       &#x27;{ &quot;page&quot;: &quot;/&quot; }&#x27;,
+                       &#x27;{ &quot;name&quot;: &quot;Safari&quot;, &quot;os&quot;: &quot;Mac&quot;, &quot;resolution&quot;: { &quot;x&quot;: 1920, &quot;y&quot;: 1080 } }&#x27;
+                    ),
+                    (&#x27;pageview&#x27;,
+                      &#x27;2&#x27;,
+                      &#x27;{ &quot;page&quot;: &quot;/contact&quot; }&#x27;,
+                      &#x27;{ &quot;name&quot;: &quot;Firefox&quot;, &quot;os&quot;: &quot;Windows&quot;, &quot;resolution&quot;: { &quot;x&quot;: 2560, &quot;y&quot;: 1600 } }&#x27;
+                    ),
+                    (
+                      &#x27;pageview&#x27;,
+                      &#x27;1&#x27;,
+                      &#x27;{ &quot;page&quot;: &quot;/products&quot; }&#x27;,
+                      &#x27;{ &quot;name&quot;: &quot;Safari&quot;, &quot;os&quot;: &quot;Mac&quot;, &quot;resolution&quot;: { &quot;x&quot;: 1920, &quot;y&quot;: 1080 } }&#x27;
+                    ),
+                    (
+                      &#x27;purchase&#x27;,
+                       &#x27;3&#x27;,
+                      &#x27;{ &quot;amount&quot;: 200 }&#x27;,
+                      &#x27;{ &quot;name&quot;: &quot;Firefox&quot;, &quot;os&quot;: &quot;Windows&quot;, &quot;resolution&quot;: { &quot;x&quot;: 1600, &quot;y&quot;: 900 } }&#x27;
+                    )
+mysql_connect.py            75 INFO     execute &#x27;commit&#x27; operation
+mysql_connect.py            52 INFO     execute sql statement: select id, browser-&gt;&#x27;$.os&#x27; browser from events
+mysql_connect.py            60 INFO     fetch all sql result: 
+mysql_connect.py            63 INFO     (1, &#x27;&quot;Mac&quot;&#x27;)
+mysql_connect.py            63 INFO     (2, &#x27;&quot;Windows&quot;&#x27;)
+mysql_connect.py            63 INFO     (3, &#x27;&quot;Mac&quot;&#x27;)
+mysql_connect.py            63 INFO     (4, &#x27;&quot;Windows&quot;&#x27;)</div></td></tr></tbody>
+      <tbody class="passed results-table-row">
+        <tr>
+          <td class="col-result">Passed</td>
+          <td class="col-name">test_mysql/test_mysql_class.py::TestJsonData::test_check_table_events_exists</td>
+          <td class="col-duration">0.02</td>
+          <td class="col-links"></td></tr>
+        <tr>
+          <td class="extra" colspan="4">
+            <div class="log">------------------------------ Captured log call -------------------------------<br/>test_mysql_class.py         64 INFO     ===&gt; test case: test_check_table_events_exists 
+mysql_connect.py            52 INFO     execute sql statement: show tables
+mysql_connect.py            60 INFO     fetch all sql result: 
+mysql_connect.py            63 INFO     (&#x27;customers&#x27;,)
+mysql_connect.py            63 INFO     (&#x27;events&#x27;,)
+mysql_connect.py            63 INFO     (&#x27;t&#x27;,)
+mysql_connect.py            63 INFO     (&#x27;vc&#x27;,)
+test_mysql_class.py         69 INFO     [&#x27;customers&#x27;, &#x27;events&#x27;, &#x27;t&#x27;, &#x27;vc&#x27;]</div></td></tr></tbody>
+      <tbody class="passed results-table-row">
+        <tr>
+          <td class="col-result">Passed</td>
+          <td class="col-name">test_mysql/test_mysql_class.py::TestJsonData::test_check_delete_events_data</td>
+          <td class="col-duration">0.03</td>
+          <td class="col-links"></td></tr>
+        <tr>
+          <td class="extra" colspan="4">
+            <div class="log">------------------------------ Captured log call -------------------------------<br/>test_mysql_class.py         76 INFO     ===&gt; test case: test_check_delete_events_data 
+mysql_connect.py            52 INFO     execute sql statement: select id, browser-&gt;&#x27;$.os&#x27; browser from events
+mysql_connect.py            60 INFO     fetch all sql result: 
+mysql_connect.py            63 INFO     (1, &#x27;&quot;Mac&quot;&#x27;)
+mysql_connect.py            63 INFO     (2, &#x27;&quot;Windows&quot;&#x27;)
+mysql_connect.py            63 INFO     (3, &#x27;&quot;Mac&quot;&#x27;)
+mysql_connect.py            63 INFO     (4, &#x27;&quot;Windows&quot;&#x27;)
+test_mysql_class.py         84 INFO     ((1, &#x27;&quot;Mac&quot;&#x27;), (2, &#x27;&quot;Windows&quot;&#x27;), (3, &#x27;&quot;Mac&quot;&#x27;), (4, &#x27;&quot;Windows&quot;&#x27;))
+mysql_connect.py            52 INFO     execute sql statement: delete from events where browser-&gt;&gt;&#x27;$.name&#x27;=&#x27;Safari&#x27;
+mysql_connect.py            52 INFO     execute sql statement: select browser-&gt;&gt;&#x27;$.name&#x27; from events where browser-&gt;&gt;&#x27;$.name&#x27;=&#x27;Safari&#x27;
+mysql_connect.py            60 INFO     fetch all sql result: 
+test_mysql_class.py         95 INFO     ()</div></td></tr></tbody>
+      <tbody class="passed results-table-row">
+        <tr>
+          <td class="col-result">Passed</td>
+          <td class="col-name">test_mysql/test_mysql_class.py::TestJsonData::test_mysql_truncate_all_data_events</td>
+          <td class="col-duration">0.06</td>
+          <td class="col-links"></td></tr>
+        <tr>
+          <td class="extra" colspan="4">
+            <div class="log">------------------------------ Captured log call -------------------------------<br/>test_mysql_class.py        100 INFO     ===&gt; test case: test_mysql_truncate_all_data_events 
+mysql_connect.py            52 INFO     execute sql statement: truncate table events
+mysql_connect.py            52 INFO     execute sql statement: select * from events
+mysql_connect.py            60 INFO     fetch all sql result: 
+test_mysql_class.py        111 INFO     ()</div></td></tr></tbody>
+      <tbody class="passed results-table-row">
+        <tr>
+          <td class="col-result">Passed</td>
+          <td class="col-name">test_mysql/test_mysql_class.py::TestJsonData::test_mysql_drop_table_events</td>
+          <td class="col-duration">0.03</td>
+          <td class="col-links"></td></tr>
+        <tr>
+          <td class="extra" colspan="4">
+            <div class="log">------------------------------ Captured log call -------------------------------<br/>test_mysql_class.py        115 INFO     ===&gt; test case: test_mysql_drop_table_events 
+mysql_connect.py            52 INFO     execute sql statement: drop table events
+mysql_connect.py            52 INFO     execute sql statement: show tables
+mysql_connect.py            60 INFO     fetch all sql result: 
+mysql_connect.py            63 INFO     (&#x27;customers&#x27;,)
+mysql_connect.py            63 INFO     (&#x27;t&#x27;,)
+mysql_connect.py            63 INFO     (&#x27;vc&#x27;,)
+test_mysql_class.py        126 INFO     [&#x27;customers&#x27;, &#x27;t&#x27;, &#x27;vc&#x27;]</div></td></tr></tbody>
+      <tbody class="passed results-table-row">
+        <tr>
+          <td class="col-result">Passed</td>
+          <td class="col-name">test_mysql/test_mysql_function.py::test_mysql_create_table_employee</td>
+          <td class="col-duration">0.06</td>
+          <td class="col-links"></td></tr>
+        <tr>
+          <td class="extra" colspan="4">
+            <div class="log">------------------------------ Captured log setup ------------------------------<br/>conftest.py                 50 INFO     
+ MODULE SETUP =&gt; Fetching data from db ======
+
+conftest.py                 26 INFO     
+FUNCTION SETUP ==&gt; connect Mysql server 
+
+conftest.py                 21 INFO     MySQL server info: {&#x27;host&#x27;: &#x27;127.0.0.1&#x27;, &#x27;user&#x27;: &#x27;root&#x27;, &#x27;passwd&#x27;: &#x27;123456&#x27;, &#x27;db&#x27;: &#x27;test&#x27;, &#x27;port&#x27;: 3306} 
+mysql_connect.py            36 INFO     success to connect sql server: 127.0.0.1 with username=root password=123456------------------------------ Captured log call -------------------------------<br/>test_mysql_function.py      12 INFO     ===&gt; test case: test_mysql_create_table_employee 
+mysql_connect.py            47 INFO     delete table : EMPLOYEE
+mysql_connect.py            52 INFO     execute sql statement: drop table if exists EMPLOYEE
+mysql_connect.py            52 INFO     execute sql statement: CREATE TABLE EMPLOYEE (
+         NAME  CHAR(20) NOT NULL,
+         AGE INT,
+         SEX CHAR(1),
+         POSITION CHAR(20),
+         INCOME FLOAT )</div></td></tr></tbody>
+      <tbody class="passed results-table-row">
+        <tr>
+          <td class="col-result">Passed</td>
+          <td class="col-name">test_mysql/test_mysql_function.py::test_mysql_insert_data_to_employee</td>
+          <td class="col-duration">0.03</td>
+          <td class="col-links"></td></tr>
+        <tr>
+          <td class="extra" colspan="4">
+            <div class="log">------------------------------ Captured log setup ------------------------------<br/>conftest.py                 26 INFO     
+FUNCTION SETUP ==&gt; connect Mysql server 
+
+conftest.py                 21 INFO     MySQL server info: {&#x27;host&#x27;: &#x27;127.0.0.1&#x27;, &#x27;user&#x27;: &#x27;root&#x27;, &#x27;passwd&#x27;: &#x27;123456&#x27;, &#x27;db&#x27;: &#x27;test&#x27;, &#x27;port&#x27;: 3306} 
+mysql_connect.py            36 INFO     success to connect sql server: 127.0.0.1 with username=root password=123456------------------------------ Captured log call -------------------------------<br/>test_mysql_function.py      25 INFO     ===&gt; test case: test_mysql_insert_data_to_employee 
+mysql_connect.py            52 INFO     execute sql statement: INSERT INTO EMPLOYEE(NAME,AGE, SEX, INCOME)
+         VALUES (&#x27;Mary&#x27;, 21, &#x27;M&#x27;, 2020),
+                (&#x27;Kevin&#x27;, 22, &#x27;M&#x27;, 2100),
+                (&#x27;David&#x27;, 23, &#x27;M&#x27;, 2030),
+                (&#x27;Jack&#x27;, 21, &#x27;M&#x27;, 2200),
+                (&#x27;Marin&#x27;, 20, &#x27;F&#x27;, 2020)
+mysql_connect.py            75 INFO     execute &#x27;commit&#x27; operation
+mysql_connect.py            52 INFO     execute sql statement: select * from EMPLOYEE
+mysql_connect.py            60 INFO     fetch all sql result: 
+mysql_connect.py            63 INFO     (&#x27;Mary&#x27;, 21, &#x27;M&#x27;, None, 2020.0)
+mysql_connect.py            63 INFO     (&#x27;Kevin&#x27;, 22, &#x27;M&#x27;, None, 2100.0)
+mysql_connect.py            63 INFO     (&#x27;David&#x27;, 23, &#x27;M&#x27;, None, 2030.0)
+mysql_connect.py            63 INFO     (&#x27;Jack&#x27;, 21, &#x27;M&#x27;, None, 2200.0)
+mysql_connect.py            63 INFO     (&#x27;Marin&#x27;, 20, &#x27;F&#x27;, None, 2020.0)
+test_mysql_function.py      40 INFO     ((&#x27;Mary&#x27;, 21, &#x27;M&#x27;, None, 2020.0), (&#x27;Kevin&#x27;, 22, &#x27;M&#x27;, None, 2100.0), (&#x27;David&#x27;, 23, &#x27;M&#x27;, None, 2030.0), (&#x27;Jack&#x27;, 21, &#x27;M&#x27;, None, 2200.0), (&#x27;Marin&#x27;, 20, &#x27;F&#x27;, None, 2020.0))</div></td></tr></tbody>
+      <tbody class="passed results-table-row">
+        <tr>
+          <td class="col-result">Passed</td>
+          <td class="col-name">test_mysql/test_mysql_function.py::test_mysql_delete_data_from_employee</td>
+          <td class="col-duration">0.00</td>
+          <td class="col-links"></td></tr>
+        <tr>
+          <td class="extra" colspan="4">
+            <div class="log">------------------------------ Captured log setup ------------------------------<br/>conftest.py                 26 INFO     
+FUNCTION SETUP ==&gt; connect Mysql server 
+
+conftest.py                 21 INFO     MySQL server info: {&#x27;host&#x27;: &#x27;127.0.0.1&#x27;, &#x27;user&#x27;: &#x27;root&#x27;, &#x27;passwd&#x27;: &#x27;123456&#x27;, &#x27;db&#x27;: &#x27;test&#x27;, &#x27;port&#x27;: 3306} 
+mysql_connect.py            36 INFO     success to connect sql server: 127.0.0.1 with username=root password=123456------------------------------ Captured log call -------------------------------<br/>test_mysql_function.py      44 INFO     ===&gt; test case: test_mysql_delete_data_from_employee 
+mysql_connect.py            52 INFO     execute sql statement: delete from EMPLOYEE where AGE &gt; 21
+mysql_connect.py            52 INFO     execute sql statement: select * from EMPLOYEE where AGE &gt; 21
+mysql_connect.py            60 INFO     fetch all sql result: 
+test_mysql_function.py      55 INFO     ()</div></td></tr></tbody>
+      <tbody class="passed results-table-row">
+        <tr>
+          <td class="col-result">Passed</td>
+          <td class="col-name">test_mysql/test_mysql_function.py::test_mysql_truncate_all_data</td>
+          <td class="col-duration">0.07</td>
+          <td class="col-links"></td></tr>
+        <tr>
+          <td class="extra" colspan="4">
+            <div class="log">------------------------------ Captured log setup ------------------------------<br/>conftest.py                 26 INFO     
+FUNCTION SETUP ==&gt; connect Mysql server 
+
+conftest.py                 21 INFO     MySQL server info: {&#x27;host&#x27;: &#x27;127.0.0.1&#x27;, &#x27;user&#x27;: &#x27;root&#x27;, &#x27;passwd&#x27;: &#x27;123456&#x27;, &#x27;db&#x27;: &#x27;test&#x27;, &#x27;port&#x27;: 3306} 
+mysql_connect.py            36 INFO     success to connect sql server: 127.0.0.1 with username=root password=123456------------------------------ Captured log call -------------------------------<br/>test_mysql_function.py      59 INFO     ===&gt; test case: test_mysql_truncate_all_data 
+mysql_connect.py            52 INFO     execute sql statement: truncate table EMPLOYEE
+mysql_connect.py            52 INFO     execute sql statement: select * from EMPLOYEE
+mysql_connect.py            60 INFO     fetch all sql result: 
+test_mysql_function.py      70 INFO     ()</div></td></tr></tbody>
+      <tbody class="passed results-table-row">
+        <tr>
+          <td class="col-result">Passed</td>
+          <td class="col-name">test_mysql/test_mysql_function.py::test_mysql_drop_table_employee</td>
+          <td class="col-duration">0.30</td>
+          <td class="col-links"></td></tr>
+        <tr>
+          <td class="extra" colspan="4">
+            <div class="log">------------------------------ Captured log setup ------------------------------<br/>conftest.py                 26 INFO     
+FUNCTION SETUP ==&gt; connect Mysql server 
+
+conftest.py                 21 INFO     MySQL server info: {&#x27;host&#x27;: &#x27;127.0.0.1&#x27;, &#x27;user&#x27;: &#x27;root&#x27;, &#x27;passwd&#x27;: &#x27;123456&#x27;, &#x27;db&#x27;: &#x27;test&#x27;, &#x27;port&#x27;: 3306} 
+mysql_connect.py            36 INFO     success to connect sql server: 127.0.0.1 with username=root password=123456------------------------------ Captured log call -------------------------------<br/>test_mysql_function.py      74 INFO     ===&gt; test case: test_mysql_drop_table_employee 
+mysql_connect.py            52 INFO     execute sql statement: drop table EMPLOYEE
+mysql_connect.py            52 INFO     execute sql statement: show tables
+mysql_connect.py            60 INFO     fetch all sql result: 
+mysql_connect.py            63 INFO     (&#x27;customers&#x27;,)
+mysql_connect.py            63 INFO     (&#x27;t&#x27;,)
+mysql_connect.py            63 INFO     (&#x27;vc&#x27;,)
+test_mysql_function.py      85 INFO     [&#x27;customers&#x27;, &#x27;t&#x27;, &#x27;vc&#x27;]</div></td></tr></tbody></table></body></html>
