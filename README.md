@@ -1,6 +1,10 @@
 # allure pytest framework
 This repository contains a plugin for pytest which automatically prepares input data used to generate Allure Report. It includes two test modules, one is for mysql testing, another is for math function testing.The scripts run on windows10 system.
 
+# Updates:
+Integrate Jenkins server. Create pipeline on Jenkins server. support to use selenium webdriver to do UI testing. support different browser to test.
+
+
 Environment setup steps:
 
 1). install Java
@@ -37,10 +41,17 @@ download ALlure zip package(allure-2.7.0.zip), unzip this package to your pytest
 
         To view the allure report on the browser.
         allure serve report/
- ![alt text](https://github.com/henrychang1413/pytest_allure_framework/blob/master/allure.PNG)
- ![alt text](https://github.com/henrychang1413/pytest_allure_framework/blob/master/allure_graphs.PNG)
- ![alt text](https://github.com/henrychang1413/pytest_allure_framework/blob/master/allure_log_show.PNG)
- ![alt text](https://github.com/henrychang1413/pytest_allure_framework/blob/master/allure_fail_case.PNG)
+
+
+5). config pipeline on Jenkins server. start to build project (this project name: allure_pytest_1)
+    after build finished. check report on jenkins server
+
+ ![alt text](https://github.com/henrychang1413/pytest_allure_framework/blob/master/screenshots/Jenkins_0.PNG)
+ ![alt text](https://github.com/henrychang1413/pytest_allure_framework/blob/master/screenshots/Jenkin_Allure_1.PNG)
+ ![alt text](https://github.com/henrychang1413/pytest_allure_framework/blob/master/screenshots/Jenkin_allure_2.PNG)
+ ![alt text](https://github.com/henrychang1413/pytest_allure_framework/blob/master/screenshots/Jenkins_allure_4.PNG)
+  ![alt text](https://github.com/henrychang1413/pytest_allure_framework/blob/master/screenshots/Jenkins_log_out.PNG)
+
 
 
 
