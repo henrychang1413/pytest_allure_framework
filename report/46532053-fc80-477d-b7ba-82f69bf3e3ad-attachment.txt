@@ -1,0 +1,14 @@
+conftest.py                 16 INFO     class setup ==> open browser 
+brower_engine.py            23 INFO     Open firefox browser.
+test_firefox_google_search.py   19 INFO     
+=== start to test case: test1_search_docker ===
+
+brower_operate.py           32 INFO     Open url: https://www.google.ca
+brower_operate.py           74 INFO     Refresh page .
+brower_operate.py           60 INFO     wait for 20 seconds.
+brower_operate.py          215 INFO     Current page title is Google
+test_firefox_google_search.py   27 INFO     Google
+brower_operate.py          126 INFO     Successe to find element by name via value: q 
+brower_operate.py          215 INFO     Current page title is docker - Google Search
+test_firefox_google_search.py   36 INFO     docker - Google Search
+brower_operate.py           93 INFO     Take screenshot and save to folder: D:\pytest\pytest_allure_framework\screenshots\2019-05-13-12_00_35.png

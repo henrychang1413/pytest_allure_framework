@@ -1,0 +1,21 @@
+conftest.py                 49 INFO     
+ MODULE SETUP => Fetching data from db ======
+
+conftest.py                 25 INFO     
+FUNCTION SETUP ==> connect Mysql server 
+
+conftest.py                 20 INFO     MySQL server info: {'host': '127.0.0.1', 'user': 'root', 'passwd': '123456', 'db': 'test', 'port': 3306} 
+mysql_connect.py            36 INFO     success to connect sql server: 127.0.0.1 with username=root password=123456
+test_mysql_function.py      12 INFO     ===> test case: test_mysql_create_table_employee 
+mysql_connect.py            47 INFO     delete table : EMPLOYEE
+mysql_connect.py            52 INFO     execute sql statement: drop table if exists EMPLOYEE
+mysql_connect.py            52 INFO     execute sql statement: CREATE TABLE EMPLOYEE (
+         NAME  CHAR(20) NOT NULL,
+         AGE INT,
+         SEX CHAR(1),
+         POSITION CHAR(20),
+         INCOME FLOAT )
+conftest.py                 30 INFO     
+FUNCTION TEARDOWN ==> disconnect Mysql server
+
+mysql_connect.py           115 INFO     disconnect sql server

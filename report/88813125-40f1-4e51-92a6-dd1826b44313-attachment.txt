@@ -1,0 +1,11 @@
+conftest.py                 27 INFO     
+s1 session fixture
+conftest.py                 32 INFO     
+m1 module fixture
+conftest.py                 37 INFO     
+f1  fixture with tmpdir
+conftest.py                 42 INFO     
+f2 fixture
+test_scope.py                7 INFO     this is test foo
+conftest.py                 10 INFO     
+teardown smtp

@@ -1,0 +1,32 @@
+test_mysql_class.py         26 INFO     ===> test case: test_create_insert_data_to_events 
+mysql_connect.py            52 INFO     execute sql statement:  INSERT INTO events(event_name, visitor,properties, browser)
+             VALUES (
+                    'pageview',
+                       '1',
+                       '{ "page": "/" }',
+                       '{ "name": "Safari", "os": "Mac", "resolution": { "x": 1920, "y": 1080 } }'
+                    ),
+                    ('pageview',
+                      '2',
+                      '{ "page": "/contact" }',
+                      '{ "name": "Firefox", "os": "Windows", "resolution": { "x": 2560, "y": 1600 } }'
+                    ),
+                    (
+                      'pageview',
+                      '1',
+                      '{ "page": "/products" }',
+                      '{ "name": "Safari", "os": "Mac", "resolution": { "x": 1920, "y": 1080 } }'
+                    ),
+                    (
+                      'purchase',
+                       '3',
+                      '{ "amount": 200 }',
+                      '{ "name": "Firefox", "os": "Windows", "resolution": { "x": 1600, "y": 900 } }'
+                    )
+mysql_connect.py            75 INFO     execute 'commit' operation
+mysql_connect.py            52 INFO     execute sql statement: select id, browser->'$.os' browser from events
+mysql_connect.py            60 INFO     fetch all sql result: 
+mysql_connect.py            63 INFO     (1, '"Mac"')
+mysql_connect.py            63 INFO     (2, '"Windows"')
+mysql_connect.py            63 INFO     (3, '"Mac"')
+mysql_connect.py            63 INFO     (4, '"Windows"')

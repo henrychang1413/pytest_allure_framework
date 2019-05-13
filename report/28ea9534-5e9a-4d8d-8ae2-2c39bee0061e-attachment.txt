@@ -1,0 +1,8 @@
+test_mysql_class.py         63 INFO     ===> test case: test_check_table_events_exists 
+mysql_connect.py            52 INFO     execute sql statement: show tables
+mysql_connect.py            60 INFO     fetch all sql result: 
+mysql_connect.py            63 INFO     ('customers',)
+mysql_connect.py            63 INFO     ('events',)
+mysql_connect.py            63 INFO     ('t',)
+mysql_connect.py            63 INFO     ('vc',)
+test_mysql_class.py         68 INFO     ['customers', 'events', 't', 'vc']

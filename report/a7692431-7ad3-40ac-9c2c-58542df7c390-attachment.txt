@@ -1,5 +1,0 @@
-test_mysql_class.py        100 INFO     ===> test case: test_mysql_truncate_all_data_events 
-mysql_connect.py            52 INFO     execute sql statement: truncate table events
-mysql_connect.py            52 INFO     execute sql statement: select * from events
-mysql_connect.py            60 INFO     fetch all sql result: 
-test_mysql_class.py        111 INFO     ()

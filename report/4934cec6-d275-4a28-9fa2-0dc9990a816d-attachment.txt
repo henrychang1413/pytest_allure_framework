@@ -1,0 +1,14 @@
+conftest.py                 25 INFO     
+FUNCTION SETUP ==> connect Mysql server 
+
+conftest.py                 20 INFO     MySQL server info: {'host': '127.0.0.1', 'user': 'root', 'passwd': '123456', 'db': 'test', 'port': 3306} 
+mysql_connect.py            36 INFO     success to connect sql server: 127.0.0.1 with username=root password=123456
+test_mysql_function.py      59 INFO     ===> test case: test_mysql_truncate_all_data 
+mysql_connect.py            52 INFO     execute sql statement: truncate table EMPLOYEE
+mysql_connect.py            52 INFO     execute sql statement: select * from EMPLOYEE
+mysql_connect.py            60 INFO     fetch all sql result: 
+test_mysql_function.py      70 INFO     ()
+conftest.py                 30 INFO     
+FUNCTION TEARDOWN ==> disconnect Mysql server
+
+mysql_connect.py           115 INFO     disconnect sql server

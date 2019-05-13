@@ -1,0 +1,15 @@
+conftest.py                 49 INFO     
+ MODULE SETUP => Fetching data from db ======
+
+conftest.py                 35 INFO     class setup -> connect Mysql server
+conftest.py                 20 INFO     MySQL server info: {'host': '127.0.0.1', 'user': 'root', 'passwd': '123456', 'db': 'test', 'port': 3306} 
+mysql_connect.py            36 INFO     success to connect sql server: 127.0.0.1 with username=root password=123456
+test_mysql_class.py         13 INFO     ===> test case: test_create_table_events 
+mysql_connect.py            47 INFO     delete table : events
+mysql_connect.py            52 INFO     execute sql statement: drop table if exists events
+mysql_connect.py            52 INFO     execute sql statement: CREATE TABLE events(
+                id INT auto_increment primary key,
+                event_name VARCHAR(100),
+                visitor VARCHAR(100),
+                properties json,
+                browser json)

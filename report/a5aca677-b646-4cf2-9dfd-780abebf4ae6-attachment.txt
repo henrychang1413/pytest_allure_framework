@@ -1,0 +1,2 @@
+conftest.py                 34 INFO     parameters ['var1', 'var2']
+conftest.py                 35 INFO     this
