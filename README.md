@@ -46,11 +46,11 @@ download ALlure zip package(allure-2.7.0.zip), unzip this package to your pytest
 5). config pipeline on Jenkins server. start to build project (this project name: allure_pytest_1)
     after build finished. check report on jenkins server
 
- ![alt text](https://github.com/henrychang1413/pytest_allure_framework/blob/master/screenshots/Jenkins_0.PNG)
- ![alt text](https://github.com/henrychang1413/pytest_allure_framework/blob/master/screenshots/Jenkin_Allure_1.PNG)
- ![alt text](https://github.com/henrychang1413/pytest_allure_framework/blob/master/screenshots/Jenkin_allure_2.PNG)
- ![alt text](https://github.com/henrychang1413/pytest_allure_framework/blob/master/screenshots/Jenkins_allure_4.PNG)
-  ![alt text](https://github.com/henrychang1413/pytest_allure_framework/blob/master/screenshots/Jenkins_log_out.PNG)
+![alt text](https://github.com/henrychang1413/pytest_allure_framework/blob/master/screenshots/Jenkins_0.PNG)
+![alt text](https://github.com/henrychang1413/pytest_allure_framework/blob/master/screenshots/Jenkin_Allure_1.PNG)
+![alt text](https://github.com/henrychang1413/pytest_allure_framework/blob/master/screenshots/Jenkin_allure_2.PNG)
+![alt text](https://github.com/henrychang1413/pytest_allure_framework/blob/master/screenshots/Jenkins_allure_4.PNG)
+![alt text](https://github.com/henrychang1413/pytest_allure_framework/blob/master/screenshots/Jenkins_log_out.PNG)
 
 
 
