@@ -6,10 +6,9 @@ import pytest
 import os
 import sys
 from  src.globalparam import *
-from src.mysql_connect import MyDB
+from  src.mysql_connect import MyDB
 import logging
 log = logging.getLogger(__name__)
-
 
 def get_mysql_server_config():
     dbconfig = {}
